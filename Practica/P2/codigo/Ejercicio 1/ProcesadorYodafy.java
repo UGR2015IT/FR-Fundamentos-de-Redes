@@ -31,12 +31,13 @@ public class ProcesadorYodafy extends Thread{
 		int bytesRecibidos = 0;
 		// Array de bytes para enviar la respuesta. Podemos reservar memoria cuando vayamos a enviarka:
 		byte [] datosEnviar;
-			try {
+		try {
 			// Obtiene los flujos de escritura/lectura
 			inputStream=socketServicio.getInputStream();
 			outputStream=socketServicio.getOutputStream();
 			// Lee la frase a Yodaficar:
 			bytesRecibidos=inputStream.read(datosRecibidos);
+			if (bytesRecibidos != 0) System.out.println("Received something!");
 
 			// 		YODAFY			//
 			// Creamos un String a partir de un array de bytes de tamaño "bytesRecibidos":
@@ -78,7 +79,7 @@ public class ProcesadorYodafy extends Thread{
 		return resultado;
 	}
 
-	void run(){
+	public void run(){
 		procesa();
 	}
 }

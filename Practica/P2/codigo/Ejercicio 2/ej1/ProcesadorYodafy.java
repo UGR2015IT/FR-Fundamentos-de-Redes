@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Random;
 
-public class ProcesadorYodafy {
+public class ProcesadorYodafy extends Thread{
 	// Referencia a un socket para enviar/recibir las peticiones/respuestas
 	private Socket socketServicio;
 	// stream de lectura (por aquí se recibe lo que envía el cliente)
@@ -31,12 +31,13 @@ public class ProcesadorYodafy {
 		int bytesRecibidos = 0;
 		// Array de bytes para enviar la respuesta. Podemos reservar memoria cuando vayamos a enviarka:
 		byte [] datosEnviar;
-			try {
+		try {
 			// Obtiene los flujos de escritura/lectura
 			inputStream=socketServicio.getInputStream();
 			outputStream=socketServicio.getOutputStream();
 			// Lee la frase a Yodaficar:
 			bytesRecibidos=inputStream.read(datosRecibidos);
+			if (bytesRecibidos != 0) System.out.println("Received something!");
 
 			// 		YODAFY			//
 			// Creamos un String a partir de un array de bytes de tamaño "bytesRecibidos":
@@ -76,5 +77,9 @@ public class ProcesadorYodafy {
 		}
 		
 		return resultado;
+	}
+
+	public void run(){
+		procesa();
 	}
 }

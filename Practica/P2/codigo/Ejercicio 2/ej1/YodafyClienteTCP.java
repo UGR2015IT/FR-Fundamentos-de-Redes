@@ -11,9 +11,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class YodafyClienteTCP {
-
-	public static void main(String[] args) {
-		
+	public static void main(String[] args) {		
 		byte []bufferSend;
 		byte []bufferReceive=new byte[256];
 		int bytesRead=0;
@@ -32,13 +30,13 @@ public class YodafyClienteTCP {
 			System.err.println("Error: equipo desconocido.");
 		} catch (IOException e) {
 			System.err.println("Error: no se pudo establecer la conexion.");
-
+		}
 		try {		
 			// Flujos:			
 			InputStream inputStream = socketServicio.getInputStream();
 			OutputStream outputStream = socketServicio.getOutputStream();			
 			// Si queremos enviar una cadena de caracteres por un OutputStream, hay que pasarla primero a un array de bytes:
-			bufferSend="Al monte del volcán debes ir sin demora".getBytes();
+			bufferSend="Al monte del volcan debes ir sin demora".getBytes();
 			
 			// Enviamos el array por el outputStream;
 			outputStream.write(bufferSend,0,bufferSend.length);
@@ -55,7 +53,8 @@ public class YodafyClienteTCP {
 			for(int i=0;i<bytesRead;i++){
 				System.out.print((char)bufferReceive[i]);
 			}
-			
+			System.out.println("");
+
 			// Una vez terminado el servicio, cerramos el socket (automáticamente se cierran
 			socketServicio.close();
 			
