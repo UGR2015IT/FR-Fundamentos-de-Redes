@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Random;
 
-public class ProcesadorYodafy extends Thread{
+public class ProcesadorYodafy{
 	// Referencia a un socket para enviar/recibir las peticiones/respuestas
 	private Socket socketServicio;
 	// stream de lectura (por aquí se recibe lo que envía el cliente)
@@ -77,9 +77,5 @@ public class ProcesadorYodafy extends Thread{
 		}
 		
 		return resultado;
-	}
-
-	public void run(){
-		procesa();
 	}
 }
