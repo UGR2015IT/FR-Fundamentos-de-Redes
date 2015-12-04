@@ -1,74 +1,44 @@
-//
-// YodafyServidorIterativo
-// (CC) jjramos, 2012
-//
+// ==================================================== //
+// 		Procesador YODAFY 			//
+// ==================================================== //
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
+import java.net.DatagramSocket;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.util.Random;
 
-
-//
-// Nota: si esta clase extendiera la clase Thread, y el procesamiento lo hiciera el método "run()",
-// ¡Podríamos realizar un procesado concurrente! 
-//
-public class ProcesadorYodafy {
+public class ProcesadorYodafy{
 	// Referencia a un socket para enviar/recibir las peticiones/respuestas
-	private Socket socketServicio;
-	// stream de lectura (por aquí se recibe lo que envía el cliente)
-	private InputStream inputStream;
-	// stream de escritura (por aquí se envía los datos al cliente)
-	private OutputStream outputStream;
-	
-	// Para que la respuesta sea siempre diferente, usamos un generador de números aleatorios.
+	private DatagramSocket socketService;
+	private DatagramPacket paquete, paqueteMod;
 	private Random random;
-	
-	// Constructor que tiene como parámetro una referencia al socket abierto en por otra clase
-	public ProcesadorYodafy(Socket socketServicio) {
-		this.socketServicio=socketServicio;
+	private byte[] bufferSend = new byte[256];	
+	private int port;
+	private InetAddress address;
+	private String message;
+
+	// Constructor
+	public ProcesadorYodafy(DatagramSocket socketServicio) {
+		System.out.println("Constructing");
+		this.socketService=socketServicio;
+		this.paquete=paquete;
 		random=new Random();
 	}
 	
-	
-	// Aquí es donde se realiza el procesamiento realmente:
 	void procesa(){
-		
-		// Como máximo leeremos un bloque de 1024 bytes. Esto se puede modificar.
-		byte [] datosRecibidos=new byte[1024];
-		int bytesRecibidos=0;
-		
-		// Array de bytes para enviar la respuesta. Podemos reservar memoria cuando vayamos a enviarka:
-		byte [] datosEnviar;
-		
-		
-		try {
-			// Obtiene los flujos de escritura/lectura
-			inputStream=socketServicio.getInputStream();
-			outputStream=socketServicio.getOutputStream();
-			
-			// Lee la frase a Yodaficar:
-			////////////////////////////////////////////////////////
-			// read ... datosRecibidos.. (Completar)
-			////////////////////////////////////////////////////////
-			
-			// Yoda hace su magia:
-			// Creamos un String a partir de un array de bytes de tamaño "bytesRecibidos":
-			String peticion=new String(datosRecibidos,0,bytesRecibidos);
-			// Yoda reinterpreta el mensaje:
-			String respuesta=yodaDo(peticion);
-			// Convertimos el String de respuesta en una array de bytes:
-			datosEnviar=respuesta.getBytes();
-			
-			// Enviamos la traducción de Yoda:
-			////////////////////////////////////////////////////////
-			// ... write ... datosEnviar... datosEnviar.length ... (Completar)
-			////////////////////////////////////////////////////////
-			
-			
-			
+		try{
+			// Extraer datos del paquete
+			message = new String(paquete.getData());
+			address = paquete.getAddress();
+			port = paquete.getPort();
+			//Yodafy
+			bufferSend = (yodaDo(message)).getBytes();
+			paqueteMod = new DatagramPacket(bufferSend, bufferSend.length, address, port);
+			// Enviar el nuevo paquete
+			socketService.send(paqueteMod);
 		} catch (IOException e) {
-			System.err.println("Error al obtener los flujso de entrada/salida.");
+			System.err.println("Error en enviar el paquete!");
 		}
 
 	}

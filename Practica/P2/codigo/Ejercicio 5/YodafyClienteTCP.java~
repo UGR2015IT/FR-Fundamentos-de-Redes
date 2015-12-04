@@ -1,0 +1,67 @@
+//======================================================================//
+//			YODAFY CLIENT TCP				//
+//======================================================================//
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+public class YodafyClienteTCP {
+	public static void main(String[] args, int argv) {		
+		byte []bufferSend;
+		byte []bufferReceive=new byte[256];
+		int bytesRead=0, productID=0, productNumber = 0;
+		
+		String host="localhost";
+		int port=8989;
+		Socket socketServicio=null;
+		
+		try {
+			socketServicio = new Socket(host, port);
+		} catch (UnknownHostException e) {
+			System.err.println("Error: equipo desconocido.");
+		} catch (IOException e) {
+			System.err.println("Error: no se pudo establecer la conexion.");
+		}
+		try {	
+			do {
+				System.out.print("Enter the product number and how many were sold (divided by a space): ");
+				String input = System.console().readLine();
+				String[] s = input.split(" ");
+				productID = Integer.parseInt(s[0]);
+				productNumber = Integer.parseInt(s[1]);
+				// Flujos:			
+				InputStream inputStream = socketServicio.getInputStream();
+				OutputStream outputStream = socketServicio.getOutputStream();
+				bufferSend=(argv[0]+","+productID+","+productNumber).getBytes();
+			
+				// Enviamos el array por el outputStream;
+				outputStream.write(bufferSend,0,bufferSend.length);
+				outputStream.flush();
+			} while (productID != -1);
+			
+				// Leemos la respuesta del servidor. Para ello le pasamos un array de bytes, que intentará
+				// rellenar. El método "read(...)" devolverá el número de bytes leídos.
+				bytesRead = inputStream.read(bufferReceive);
+				// MOstremos la cadena de caracteres recibidos:
+				System.out.println("Recibido: ");
+				for(int i=0;i<bytesRead;i++){
+					System.out.print((char)bufferReceive[i]);
+				}
+				System.out.println("");
+			
+				// Excepciones:
+		} catch (UnknownHostException e) {
+			System.err.println("Error: Nombre de host no encontrado.");
+		} catch (IOException e) {
+			System.err.println("Error de entrada/salida al abrir el socket.");
+		}
+
+		// Una vez terminado el servicio, cerramos el socket (automáticamente se cierran
+		socketServicio.close();
+	}
+}
