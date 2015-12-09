@@ -1,5 +1,5 @@
 //======================================================================//
-//			YODAFY CLIENT TCP				//
+//			CLIENT.JAVA					//
 //======================================================================//
 import java.io.*;
 import java.net.Socket;
@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import java.util.Random;
 
 public class Client {
-	public static void main(String[] args, int argv) {
+	public static void main(String[] args) {
 		String bufferSend,bufferReceive;
 		int productID=0, productNumber = 0, port=8989;
 		String host="localhost";
@@ -56,6 +56,27 @@ public class Client {
 		} while (productID != -1);
 
 		System.out.println("Done sending product info to server. Waiting for summary...");
+		try {
+			// Streams			
+			InputStream inputStream = socketService.getInputStream();
+			OutputStream outputStream = socketService.getOutputStream();
+			BufferedReader inReader = new BufferedReader(new InputStreamReader(inputStream));
+
+			System.out.println("#############");
+			System.out.println("PRODUCT LIST:");
+			System.out.println("#############");
+			
+			for (int k=0;k<10;k++){
+				bufferReceive = inReader.readLine();
+				System.out.println(bufferReceive);
+			}
+			
+			System.out.println("#############");
+		} catch (UnknownHostException e) {
+			System.err.println("Error: Nombre de host no encontrado.");
+		} catch (IOException e) {
+			System.err.println("Error de entrada/salida al abrir el socket.");
+		}
 
 		// Close the socket
 		try {

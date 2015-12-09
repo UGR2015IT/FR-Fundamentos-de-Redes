@@ -22,11 +22,3 @@ public class YodafyServidorIterativo {
         	}
 	}
 }
-
-public class MyServer extends Thread{
-	private Socket socket;
-
-	public MyServer(Socket clientSocket) {
-		this.socket = clientSocket;
-	}
-}

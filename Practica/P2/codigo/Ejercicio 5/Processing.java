@@ -22,43 +22,40 @@ public class Processing extends Thread {
 	public Processing(Socket socketService) {
 		this.socketService=socketService;
 	}
-	
-	public void run(){
-		query();
-	}
 
 	void query(){
 		try {
 			// Streams			
-			InputStream inputStream = socketService.getInputStream();
-			OutputStream outputStream = socketService.getOutputStream();
-		} catch (UnknownHostException e) {
-			System.err.println("Error: Nombre de host no encontrado.");
-		} catch (IOException e) {
-			System.err.println("Error de entrada/salida al abrir el socket.");
-		}
-		try{
+			inputStream = socketService.getInputStream();
+			outputStream = socketService.getOutputStream();
+
 			BufferedReader inReader = new BufferedReader(new InputStreamReader(inputStream));
 			String stringReceived = inReader.readLine();
+				System.out.println("Here!");
+
 			int[] newEntry = {0,0};
 			String s[] = stringReceived.split("_");
 			for (int i=0;i<2;i++) newEntry[i]=Integer.parseInt(s[i]);
 			fillInternalDB();
+
+			PrintWriter outPrinter = new PrintWriter(outputStream, true);
 			if (newEntry[0] != -1) {
+				System.out.println("Here!");
 				addToDB(newEntry);
+				System.out.println("Here!");
 				writeDB();
+				System.out.println("Here!");
+				outPrinter.println("INPUT_RECEIVED");
 			} else {
 				// invia sul socket la lista dei prodotti, ordine decrescente
 				sorting();
-				PrintWriter outPrinter = new PrintWriter(outputStream, true);
 				for (int k=0;k<10;k++) outPrinter.println(Arrays.toString(database[k]));
-				outPrinter.flush();
-				outPrinter.close();		
-			}			
+			}
+		} catch (UnknownHostException e) {
+			System.err.println("Error: Nombre de host no encontrado.");
 		} catch (IOException e) {
-			System.err.println("Error al obtener los flujso de entrada/salida.");
-		}
-				
+			System.err.println("Error de entrada/salida al abrir el socket.");
+		}				
 	}
 
 	void fillInternalDB(){
@@ -102,13 +99,19 @@ public class Processing extends Thread {
 	
 	void sorting(){
 		int[] temp = {999,999};
-		temp[0] = database[0][0];
-		temp[1] = database[0][1];
-		for (int i=1;i<10;i++)
-			if (database[i][1] < temp[1]){
-				//temp = database[i][1];
-				//database[i][1] = database[i+1][1];
-				//database[i+1][1] = temp;
+		for (int i=0;i<10;i++){
+			temp[0] = database[i][0];
+			temp[1] = database[i][1];
+			if (database[i+1][1] < temp[1]){
+				database[i][0] = database[i+1][0];
+				database[i][1] = database[i+1][1];
+				database[i+1][0] = temp[0];
+				database[i+1][1] = temp[1];
 			}
+		}
+	}
+	
+	public void run(){
+		query();
 	}
 }
