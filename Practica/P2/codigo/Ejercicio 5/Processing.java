@@ -28,10 +28,11 @@ public class Processing extends Thread {
 			// Streams			
 			inputStream = socketService.getInputStream();
 			outputStream = socketService.getOutputStream();
+			System.out.println("Here!");
 
 			BufferedReader inReader = new BufferedReader(new InputStreamReader(inputStream));
 			String stringReceived = inReader.readLine();
-				System.out.println("Here!");
+			System.out.println("Here!");
 
 			int[] newEntry = {0,0};
 			String s[] = stringReceived.split("_");
