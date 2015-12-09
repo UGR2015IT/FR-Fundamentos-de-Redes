@@ -17,7 +17,7 @@ public class YodafyServidorIterativo {
 			do {
 				Socket socketServicio = socketClient.accept();
 				ProcesadorYodafy procesador=new ProcesadorYodafy(socketServicio);
-				//No se debe llamar ningun procedimiento porque se va a ejecutar concurrentemente por el metodo run()				
+				procesador.start();
 			} while (true);
 			
 		} catch (IOException e) {

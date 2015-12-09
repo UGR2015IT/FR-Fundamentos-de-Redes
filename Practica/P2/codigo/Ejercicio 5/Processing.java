@@ -28,29 +28,35 @@ public class Processing extends Thread {
 			// Streams			
 			inputStream = socketService.getInputStream();
 			outputStream = socketService.getOutputStream();
-
 			BufferedReader inReader = new BufferedReader(new InputStreamReader(inputStream));
-			stringReceived = inReader.readLine();
-
-			int[] newEntry = {0,0};
-			String[] s = stringReceived.split("_");
-			for (int i=0;i<2;i++) newEntry[i]=Integer.parseInt(s[i]);
-			fillInternalDB();
-
 			PrintWriter outPrinter = new PrintWriter(outputStream, true);
-			if (newEntry[0] != -1) {
-				addToDB(newEntry);
-				writeDB();
-				outPrinter.println("INPUT_RECEIVED");
-			} else {
-				outPrinter.println("SORT_RECEIVED");
-				// invia sul socket la lista dei prodotti, ordine decrescente
-				sorting();
-				for (int k=0;k<10;k++) {
-					myString = inReader.readLine();
-					outPrinter.println(Arrays.toString(database[k]));
+
+			do {
+				stringReceived = inReader.readLine();
+
+				if (stringReceived.equals("REQ_CONN")) outPrinter.println("ACK");
+				else {
+					int[] newEntry = {0,0};
+					String[] s = stringReceived.split("_");
+					for (int i=0;i<2;i++) newEntry[i]=Integer.parseInt(s[i]);
+					fillInternalDB();
+
+					if (newEntry[0] != -1) {
+						addToDB(newEntry);
+						writeDB();
+						outPrinter.println("INPUT_RECEIVED");
+					} else {
+						outPrinter.println("SORT_RECEIVED");
+						// invia sul socket la lista dei prodotti, ordine decrescente
+						sorting();
+						for (int k=0;k<10;k++) {
+							myString = inReader.readLine();
+							outPrinter.println(Arrays.toString(database[k]));
+						}
+						break;
+					}
 				}
-			}
+			} while (true);
 		} catch (UnknownHostException e) {
 			System.err.println("Error: Nombre de host no encontrado.");
 		} catch (IOException e) {
@@ -59,6 +65,11 @@ public class Processing extends Thread {
 	}
 
 	void fillInternalDB(){
+		// Clean internal database
+		for (int k=0;k<10;k++){
+			database[k][0]=0;
+			database[k][1]=0;
+		}
 		int i=0,j=0;
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));

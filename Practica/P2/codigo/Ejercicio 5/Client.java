@@ -18,41 +18,49 @@ public class Client {
 		} catch (IOException e) {
 			System.err.println("Error de entrada/salida al abrir el socket.");
 		}
-		do {
-			try {
-				// Streams			
-				InputStream inputStream = socketService.getInputStream();
-				OutputStream outputStream = socketService.getOutputStream();
-				
-				// Ask for product info
-				System.out.println("Enter -1 and any random number to exit.");
-				System.out.println("Enter the product number (0-9) and how many there are in the inventory (divided by a space):");
-				String input = System.console().readLine();
-				String[] s = input.split(" ");
-				productID = Integer.parseInt(s[0]);
-				productNumber = Integer.parseInt(s[1]);
-				bufferSend = productID+"_"+productNumber;
+		try {
+			// Streams			
+			InputStream inputStream = socketService.getInputStream();
+			OutputStream outputStream = socketService.getOutputStream();
+			PrintWriter outPrinter = new PrintWriter(outputStream, true);				
+			BufferedReader inReader = new BufferedReader(new InputStreamReader(inputStream));
+			
+			// Wait for connection acknowledgement
+			outPrinter.println("REQ_CONN");
+			outPrinter.flush();
+			bufferReceive = inReader.readLine();
 
-				// Send stream with product info
-				PrintWriter outPrinter = new PrintWriter(outputStream, true);
-				outPrinter.println(bufferSend);
-				outPrinter.flush();
+			if (bufferReceive.equals("ACK")){
+				System.out.println("Acknowledgement received!");
+				do {
+					// Ask for product info
+					System.out.println("Enter -1 and any random number to exit.");
+					System.out.println("Enter the product number (0-9) and how many there are in the inventory (divided by a space):");
+					String input = System.console().readLine();
+					String[] s = input.split(" ");
+					productID = Integer.parseInt(s[0]);
+					productNumber = Integer.parseInt(s[1]);
+					bufferSend = productID+"_"+productNumber;
+
+					// Send stream with product info
+					outPrinter.println(bufferSend);
+					outPrinter.flush();
 
 				
-				// Read server's response
-				System.out.println("Waiting for the query to be accepted ...");
-				BufferedReader inReader = new BufferedReader(new InputStreamReader(inputStream));
-				bufferReceive = inReader.readLine();
-				System.out.println("> Message received by the server: ");
-				System.out.println("> "+bufferReceive);
-				System.out.println("> ");
-				System.out.println("");
-			} catch (UnknownHostException e) {
-				System.err.println("Error: Nombre de host no encontrado.");
-			} catch (IOException e) {
-				System.err.println("Error de entrada/salida al abrir el socket.");
-			}
-		} while (productID != -1);
+					// Read server's response
+					System.out.println("Waiting for the query to be accepted ...");
+					bufferReceive = inReader.readLine();
+					System.out.println("> Message received by the server: ");
+					System.out.println("> "+bufferReceive);
+					System.out.println("> ");
+					System.out.println("");
+				} while (productID != -1);
+			} else { System.out.println("Error in receiving acknowledgement"); }
+		} catch (UnknownHostException e) {
+			System.err.println("Error: Nombre de host no encontrado.");
+		} catch (IOException e) {
+			System.err.println("Error de entrada/salida al abrir el socket.");
+		}
 
 		System.out.println("Done sending product info to server. Waiting for summary...");
 		try {
