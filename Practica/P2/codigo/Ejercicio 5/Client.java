@@ -25,7 +25,7 @@ public class Client {
 				OutputStream outputStream = socketService.getOutputStream();
 				
 				// Ask for product info
-				System.out.println("Enter -1 to exit.");
+				System.out.println("Enter -1 and any random number to exit.");
 				System.out.println("Enter the product number (0-9) and how many there are in the inventory (divided by a space):");
 				String input = System.console().readLine();
 				String[] s = input.split(" ");
