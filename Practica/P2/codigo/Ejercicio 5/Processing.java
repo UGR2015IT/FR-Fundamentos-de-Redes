@@ -5,7 +5,6 @@
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,38 +18,38 @@ public class Processing extends Thread {
 	//Get entries from external file
 	private static final String fileName = "database.txt";
 
-	public Processing(Socket socketService) {
-		this.socketService=socketService;
+	public Processing(Socket mySocket) {
+		this.socketService=mySocket;
 	}
 
 	void query(){
+		String stringReceived,myString;
 		try {
 			// Streams			
 			inputStream = socketService.getInputStream();
 			outputStream = socketService.getOutputStream();
-			System.out.println("Here!");
 
 			BufferedReader inReader = new BufferedReader(new InputStreamReader(inputStream));
-			String stringReceived = inReader.readLine();
-			System.out.println("Here!");
+			stringReceived = inReader.readLine();
 
 			int[] newEntry = {0,0};
-			String s[] = stringReceived.split("_");
+			String[] s = stringReceived.split("_");
 			for (int i=0;i<2;i++) newEntry[i]=Integer.parseInt(s[i]);
 			fillInternalDB();
 
 			PrintWriter outPrinter = new PrintWriter(outputStream, true);
 			if (newEntry[0] != -1) {
-				System.out.println("Here!");
 				addToDB(newEntry);
-				System.out.println("Here!");
 				writeDB();
-				System.out.println("Here!");
 				outPrinter.println("INPUT_RECEIVED");
 			} else {
+				outPrinter.println("SORT_RECEIVED");
 				// invia sul socket la lista dei prodotti, ordine decrescente
 				sorting();
-				for (int k=0;k<10;k++) outPrinter.println(Arrays.toString(database[k]));
+				for (int k=0;k<10;k++) {
+					myString = inReader.readLine();
+					outPrinter.println(Arrays.toString(database[k]));
+				}
 			}
 		} catch (UnknownHostException e) {
 			System.err.println("Error: Nombre de host no encontrado.");
@@ -100,7 +99,7 @@ public class Processing extends Thread {
 	
 	void sorting(){
 		int[] temp = {999,999};
-		for (int i=0;i<10;i++){
+		for (int i=0;i<9;i++){
 			temp[0] = database[i][0];
 			temp[1] = database[i][1];
 			if (database[i+1][1] < temp[1]){

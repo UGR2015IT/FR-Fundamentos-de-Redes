@@ -18,6 +18,7 @@ public class Server {
 			do {
 				socket = serverSocket.accept();
 				Processing procesador=new Processing(socket);
+				procesador.start();
 			} while (true);
 		} catch (IOException e) {
 			System.err.println("Error de entrada/salida al abrir el socket.");

@@ -3,7 +3,6 @@
 //======================================================================//
 import java.io.*;
 import java.net.Socket;
-import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.Random;
 
@@ -67,8 +66,12 @@ public class Client {
 			System.out.println("#############");
 			
 			for (int k=0;k<10;k++){
+				PrintWriter outPrinter = new PrintWriter(outputStream, true);
+				outPrinter.println("LIST_ELEMENT_RECEIVED");
+				outPrinter.flush();
 				bufferReceive = inReader.readLine();
 				System.out.println(bufferReceive);
+				
 			}
 			
 			System.out.println("#############");
